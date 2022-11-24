@@ -53,17 +53,23 @@ class WebDAVAdapter extends AbstractAdapter
     protected $useStreamedCopy = true;
 
     /**
+     * @var ?int
+     */
+    protected $internalHttpPort = null;
+
+    /**
      * Constructor.
      *
      * @param Client $client
      * @param string $prefix
      * @param bool $useStreamedCopy
      */
-    public function __construct(Client $client, $prefix = null, $useStreamedCopy = true)
+    public function __construct(Client $client, $prefix = null, $useStreamedCopy = true, $internalHttpPort = null)
     {
         $this->client = $client;
         $this->setPathPrefix($prefix);
         $this->setUseStreamedCopy($useStreamedCopy);
+        $this->internalHttpPort = $internalHttpPort;
     }
 
     /**
@@ -415,5 +421,17 @@ class WebDAVAdapter extends AbstractAdapter
         }
 
         return isset($object['{DAV:}iscollection']) && $object['{DAV:}iscollection'] === '1';
+    }
+
+    /**
+     * Remove a path prefix.
+     *
+     * @param string $path
+     *
+     * @return string path without the prefix
+     */
+    public function removePathPrefix($path)
+    {
+        return substr($path, strlen(((string) $this->getPathPrefix()).($this->internalHttpPort ? ':'.$this->internalHttpPort : '')));
     }
 }
